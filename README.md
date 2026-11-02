@@ -19,6 +19,19 @@ Windows PC
 
 Jetson과 같은 Ubuntu 22.04에서 빌드해야 glibc 차이로 실행이 안 되는 문제를 피할 수 있습니다.
 
+## 지원 범위
+
+| 항목 | 지원 | 비고 |
+|---|---|---|
+| JetPack 6.x (Ubuntu 22.04) | 예 | |
+| JetPack 5.x 이하 (Ubuntu 20.04 이하) | **아니요** | glibc가 낮아 여기서 빌드한 파일이 실행되지 않음 |
+| CMake 프로젝트 | 예 | 실행 파일에 `install` 규칙 필요 |
+| Makefile 등 다른 빌드 방식 | 직접 | `jetson-env shell`에서 `aarch64-linux-gnu-g++`로 빌드 |
+| 표준 C/C++, Linux 시스템 API | 예 | |
+| 외부 라이브러리 (OpenCV, Boost, GStreamer 등) | **아직 아니요** | 이미지에 ARM64판이 없음. sysroot 필요 |
+| Jetson 전용 (CUDA, TensorRT, Multimedia API, VPI) | **아직 아니요** | sysroot 필요. 지정 기능만 있고 시험하지 않음 |
+| 원격 디버깅 | **아직 아니요** | `gdb-multiarch`만 포함 |
+
 ## 설치
 
 ### 1. WSL2 설치
