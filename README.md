@@ -87,7 +87,19 @@ jetson-build --test
 
 ## 선택: Jetson에서 실행해 보기
 
-빌드한 실행 파일을 Jetson에 복사해 실제로 실행합니다. Jetson에 SSH로 접속할 수 있어야 하며, `user@<JETSON_IP>`는 Jetson 계정과 주소로 바꿉니다.
+빌드한 실행 파일을 Jetson에 복사해 실제로 실행합니다. `user@<JETSON_IP>`는 Jetson 계정과 주소로 바꿉니다.
+
+`jetson-deploy`는 비밀번호를 묻지 않으므로 SSH 키를 먼저 등록합니다. 키가 이미 있으면 첫 명령은 건너뜁니다. 두 번째 명령에서 Jetson 비밀번호를 한 번 입력합니다.
+
+```bash
+ssh-keygen -t ed25519
+```
+
+```bash
+cat ~/.ssh/id_ed25519.pub | ssh user@<JETSON_IP> "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+```
+
+SSH 포트가 22가 아니면 두 명령 모두 `-p 포트`를 붙입니다(`jetson-deploy -p 10001 ...`, `ssh -p 10001 ...`).
 
 ```bash
 jetson-deploy user@<JETSON_IP> /home/user/hello
@@ -124,7 +136,7 @@ jetson-dev-env/
 | `jetson-build --test` | 빌드 후 시험 (ARM64를 QEMU로 실행) |
 | `jetson-build --native --debug --test` | PC용 디버그 빌드와 시험 |
 | `jetson-build --clean` | 빌드 폴더를 지우고 빌드 |
-| `jetson-deploy USER@HOST DIR` | 실행 파일을 Jetson에 복사 |
+| `jetson-deploy [-p PORT] USER@HOST DIR` | 실행 파일을 Jetson에 복사. 실행 중인 파일도 교체 가능 |
 | `jetson-env shell` | 컨테이너 셸 |
 | `jetson-env check` | 도구 버전 확인 |
 | `jetson-env save FILE`, `load FILE` | 이미지를 파일로 전달 |
@@ -181,5 +193,6 @@ JETSON_SYSROOT=/path/to/sysroot jetson-build
 | `bad interpreter` | 줄바꿈이 CRLF로 바뀜. 저장소를 WSL 안에서 다시 받기 |
 | 첫 빌드에서 `CMakeCache` 경로 오류 | 복사해 온 `build/` 폴더 삭제 후 다시 빌드 |
 | Jetson에서 `GLIBC_x.xx not found` | `jetson-build`로 빌드했는지 확인 |
+| `jetson-deploy`가 `Permission denied` | SSH 키 등록 확인. Git Bash와 PowerShell은 키를 두는 홈 폴더가 다를 수 있음 |
 | 빌드가 매우 느림 | 소스를 `/mnt/d`에서 WSL 안으로 옮기기 |
 | `Permission denied`로 스크립트 실행 불가 | `git update-index --chmod=+x install.sh bin/*` 후 커밋 |

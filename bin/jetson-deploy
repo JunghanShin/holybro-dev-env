@@ -4,22 +4,39 @@ set -euo pipefail
 
 usage() {
     cat <<EOF
-usage: jetson-deploy USER@HOST REMOTE_DIR [프로젝트 폴더]
+usage: jetson-deploy [-p PORT] USER@HOST REMOTE_DIR [프로젝트 폴더]
 
+  -p PORT        SSH 포트 (기본 22)
   USER@HOST      Jetson 접속 정보
   REMOTE_DIR     Jetson에서 실행 파일을 둘 절대 경로
   프로젝트 폴더  기본값은 현재 폴더
 
   복사 대상: <프로젝트>/build/jetson/install/bin/*
+  실행 중인 파일도 교체할 수 있도록 임시 이름으로 복사한 뒤 이름을 바꾼다.
+  비밀번호 없이 접속되도록 SSH 키를 등록해 두어야 한다.
 EOF
 }
 
-case "${1:-}" in -h|--help) usage; exit 0 ;; esac
-[ $# -ge 2 ] && [ $# -le 3 ] || { usage; exit 2; }
+port=22
+positional=()
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+        -p)
+            [ $# -ge 2 ] || { usage; exit 2; }
+            port="$2"
+            shift
+            ;;
+        -*) usage; exit 2 ;;
+        *) positional+=("$1") ;;
+    esac
+    shift
+done
 
-host="$1"
-remote_dir="$2"
-project="${3:-.}"
+[ ${#positional[@]} -ge 2 ] && [ ${#positional[@]} -le 3 ] || { usage; exit 2; }
+host="${positional[0]}"
+remote_dir="${positional[1]}"
+project="${positional[2]:-.}"
 
 bin_dir="$project/build/jetson/install/bin"
 shopt -s nullglob
@@ -29,7 +46,18 @@ if [ ${#binaries[@]} -eq 0 ]; then
     exit 1
 fi
 
-export MSYS_NO_PATHCONV=1
-ssh "$host" "mkdir -p '$remote_dir'"
-scp "${binaries[@]}" "$host:$remote_dir/"
-ssh "$host" "echo \"arch: \$(uname -m)\"; ls -l '$remote_dir'"
+names=()
+for binary in "${binaries[@]}"; do names+=("$(basename "$binary")"); done
+
+# 접속 한 번으로 끝낸다. 임시 폴더에 풀고 mv로 바꾸므로 실행 중인 파일도 교체된다.
+# 실행 중인 프로세스는 다시 시작할 때까지 이전 파일을 쓴다.
+staging="$remote_dir/.deploy-$$"
+tar -C "$bin_dir" -cf - "${names[@]}" | ssh -p "$port" -o BatchMode=yes "$host" "
+    set -e
+    mkdir -p '$staging'
+    tar -C '$staging' -xf -
+    for n in ${names[*]}; do chmod 755 \"$staging/\$n\"; mv -f \"$staging/\$n\" '$remote_dir/'; done
+    rmdir '$staging'
+    echo \"arch: \$(uname -m)\"
+    cd '$remote_dir' && ls -l ${names[*]}
+"
