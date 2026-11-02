@@ -1,0 +1,15 @@
+{
+  "name": "Jetson cross build",
+  "image": "jetson-dev:1.0",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/work,type=bind",
+  "workspaceFolder": "/work",
+  "remoteUser": "dev",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools"
+      ]
+    }
+  }
+}

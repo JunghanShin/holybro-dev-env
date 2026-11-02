@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# 컨테이너 안에서 현재 폴더의 CMake 프로젝트를 빌드한다.
+set -euo pipefail
+
+target=jetson
+build_type=Release
+run_tests=0
+clean=0
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --native) target=native ;;
+        --debug) build_type=Debug ;;
+        --test) run_tests=1 ;;
+        --clean) clean=1 ;;
+        *) echo "unknown option: $1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+[ -f CMakeLists.txt ] || { echo "CMakeLists.txt가 없습니다: $PWD" >&2; exit 2; }
+
+build_dir="$PWD/build/$target"
+[ "$clean" -eq 1 ] && rm -rf "$build_dir"
+
+cmake_args=(-S . -B "$build_dir" -G Ninja "-DCMAKE_BUILD_TYPE=$build_type")
+if [ "$target" = jetson ]; then
+    cmake_args+=("-DCMAKE_TOOLCHAIN_FILE=/opt/jetson-dev/jetson-toolchain.cmake")
+fi
+
+cmake "${cmake_args[@]}"
+cmake --build "$build_dir"
+cmake --install "$build_dir" --prefix "$build_dir/install"
+
+if [ "$run_tests" -eq 1 ]; then
+    ctest --test-dir "$build_dir" --output-on-failure
+fi
+
+echo
+echo "결과: build/$target/install/bin/"
+for binary in "$build_dir"/install/bin/*; do
+    [ -e "$binary" ] && file -b "$binary" | cut -d, -f1-2 | sed "s|^|  $(basename "$binary"): |"
+done

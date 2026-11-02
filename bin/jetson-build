@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# 현재 폴더(또는 지정한 폴더)의 CMake 프로젝트를 컨테이너에서 빌드한다.
+set -euo pipefail
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/common.sh"
+
+usage() {
+    cat <<EOF
+usage: jetson-build [옵션] [프로젝트 폴더]
+
+  프로젝트 폴더   기본값은 현재 폴더
+
+  --native       PC(x86_64)용으로 빌드 (기본은 Jetson aarch64)
+  --debug        Debug 빌드 (기본은 Release)
+  --test         빌드 후 시험 실행 (Jetson 빌드는 QEMU로 실행)
+  --clean        빌드 폴더를 지우고 빌드
+
+  결과: <프로젝트>/build/<jetson|native>/install/bin/
+  실행 파일은 CMake install 규칙이 있어야 결과에 포함됩니다.
+EOF
+}
+
+options=()
+project="."
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help) usage; exit 0 ;;
+        --native|--debug|--test|--clean) options+=("$1") ;;
+        -*) usage; exit 2 ;;
+        *) project="$1" ;;
+    esac
+    shift
+done
+
+[ -d "$project" ] || { echo "폴더가 없습니다: $project" >&2; exit 2; }
+project="$(cd "$project" && pwd)"
+
+require_docker
+root="$(find_project_root "$project")"
+check_project_version "$root"
+run_in_container "$root" "$(relative_path "$root" "$project")" jetson-build ${options[@]+"${options[@]}"}

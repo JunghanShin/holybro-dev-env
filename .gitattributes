@@ -1,0 +1,2 @@
+# Windows에서 받아도 Linux용 파일이 CRLF로 바뀌지 않게 한다.
+* text=auto eol=lf

@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# 빌드 환경(Docker 이미지와 컨테이너) 관리.
+set -euo pipefail
+source "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/common.sh"
+
+usage() {
+    cat <<EOF
+usage: jetson-env COMMAND
+
+  build          이미지 빌드
+  check          도구 버전 출력
+  shell          현재 프로젝트를 연 컨테이너 셸
+  run CMD...     현재 프로젝트에서 컨테이너 명령 실행
+  save FILE      이미지를 파일로 저장 (인터넷 없는 PC에 전달할 때)
+  load FILE      저장한 이미지 불러오기
+  version        환경 버전과 이미지 이름 출력
+EOF
+}
+
+command="${1:-}"
+[ $# -gt 0 ] && shift
+
+case "$command" in
+    version)
+        echo "$VERSION ($IMAGE)"
+        exit 0
+        ;;
+    ""|-h|--help)
+        usage
+        exit 0
+        ;;
+esac
+
+require_docker
+project="$(pwd)"
+root="$(find_project_root "$project")"
+relative="$(relative_path "$root" "$project")"
+
+case "$command" in
+    build) build_image ;;
+    check)
+        run_in_container "$root" "$relative" bash -c 'aarch64-linux-gnu-g++ --version | head -1; g++ --version | head -1; cmake --version | head -1; echo "ninja $(ninja --version)"; qemu-aarch64 --version | head -1; ldd --version | head -1'
+        ;;
+    shell)
+        check_project_version "$root"
+        run_in_container "$root" "$relative" bash
+        ;;
+    run)
+        [ $# -gt 0 ] || { usage; exit 2; }
+        check_project_version "$root"
+        run_in_container "$root" "$relative" "$@"
+        ;;
+    save)
+        [ $# -eq 1 ] || { usage; exit 2; }
+        ensure_image
+        docker save "$IMAGE" -o "$1"
+        ;;
+    load)
+        [ $# -eq 1 ] || { usage; exit 2; }
+        docker load -i "$1"
+        ;;
+    *)
+        usage
+        exit 2
+        ;;
+esac
