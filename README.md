@@ -70,9 +70,11 @@ cp -r ~/jetson-dev-env/template/hello ~/hello && cd ~/hello
 jetson-build --test
 ```
 
-`100% tests passed`와 `ARM aarch64`가 표시되면 환경이 갖춰진 것입니다.
+`100% tests passed`와 `ARM aarch64`가 표시되면 환경이 갖춰진 것입니다. 여기까지는 Jetson이 없어도 됩니다.
 
-Jetson이 연결되어 있으면 복사해서 실행합니다. `user@<JETSON_IP>`는 Jetson 계정과 주소로 바꿉니다.
+## 선택: Jetson에서 실행해 보기
+
+빌드한 실행 파일을 Jetson에 복사해 실제로 실행합니다. Jetson에 SSH로 접속할 수 있어야 하며, `user@<JETSON_IP>`는 Jetson 계정과 주소로 바꿉니다.
 
 ```bash
 jetson-deploy user@<JETSON_IP> /home/user/hello
@@ -82,7 +84,7 @@ jetson-deploy user@<JETSON_IP> /home/user/hello
 ssh user@<JETSON_IP> /home/user/hello/hello
 ```
 
-`hello from ... (aarch64)`가 출력되면 전체 과정이 끝난 것입니다.
+`hello from ... (aarch64)`가 출력되면 Jetson에서도 정상 실행되는 것입니다.
 
 ## 구성
 
