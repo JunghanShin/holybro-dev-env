@@ -15,7 +15,7 @@ Windows PC
 
 | 항목 | 값 |
 |---|---|
-| 대상 | Jetson Orin 계열(GPU `sm_87`), **JetPack 6.2.2** (L4T r36.5), Ubuntu 22.04, aarch64 |
+| 대상 | Jetson Orin 계열(GPU `sm_87`), **JetPack 6.2.2** (L4T 36.5.0), Ubuntu 22.04, aarch64 |
 | 컴파일러 | `aarch64-linux-gnu-g++` 11.4, CUDA `nvcc` 12.6 |
 | 도구 | CMake 3.22, Ninja, pkg-config, QEMU(ARM64 시험 실행) |
 
@@ -27,13 +27,15 @@ Windows PC
 | TensorRT | 10.3.0 | `/usr/include/aarch64-linux-gnu`, `/usr/lib/aarch64-linux-gnu` |
 | cuDNN | 9.3.0 | 위와 같음 |
 | VPI | 3.2.4 | `/opt/nvidia/vpi3` |
-| Multimedia API (NvBufSurface, V4L2 인코더·디코더) | 36.5.2 | `/usr/src/jetson_multimedia_api`, `/usr/lib/aarch64-linux-gnu/nvidia` |
+| Multimedia API (NvBufSurface, V4L2 인코더·디코더) | 36.5.0 | `/usr/src/jetson_multimedia_api`, `/usr/lib/aarch64-linux-gnu/nvidia` |
 | OpenCV (NVIDIA 빌드) | 4.8.0 | `/usr/include/opencv4` |
 | GStreamer | 1.20 | pkg-config `gstreamer-1.0` |
 
 버전은 `docker/jetpack-6.2.2.list`에 고정되어 있습니다. Jetson에서 `apt-get -s install nvidia-jetpack=6.2.2+b24`로 얻은 목록입니다. sysroot는 컨테이너의 `/opt/jetson/sysroot`에 있고, `jetson-build`가 자동으로 사용합니다.
 
 Jetson과 같은 Ubuntu 22.04와 같은 라이브러리 버전으로 빌드해야, glibc나 라이브러리 차이로 실행이 안 되는 문제를 피할 수 있습니다.
+
+보드 쪽도 같은 버전이어야 합니다. Holybro 캐리어 보드는 [holybro-build-image](https://github.com/JunghanShin/holybro-build-image)로 이미지를 만들면 같은 목록(`jetpack-6.2.2.list`)으로 JetPack 런타임이 들어갑니다. 다른 보드는 `sudo apt install nvidia-jetpack-runtime=6.2.2+b24`처럼 **버전을 지정해** 설치합니다. NVIDIA 저장소에는 6.2.3도 있어서 버전을 빼면 다른 버전이 설치됩니다.
 
 ## 지원 범위
 

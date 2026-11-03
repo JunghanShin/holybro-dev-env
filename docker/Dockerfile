@@ -1,4 +1,4 @@
-# Jetson(JetPack 6.2.2, L4T r36.5, Ubuntu 22.04, aarch64) 전용 C/C++/CUDA 크로스 컴파일 환경.
+# Jetson(JetPack 6.2.2, L4T 36.5.0, Ubuntu 22.04, aarch64) 전용 C/C++/CUDA 크로스 컴파일 환경.
 #
 #   - aarch64 크로스 컴파일러 (Ubuntu)
 #   - CUDA 크로스 컴파일러 nvcc (NVIDIA Jetson x86_64 저장소)
@@ -61,13 +61,17 @@ RUN set -eu; \
     grep -vE '^(#|$)' /tmp/jetpack.list \
         | awk -F= '{print "Package: "$1"\nPin: version "$2"\nPin-Priority: 1001\n"}' \
         > $A/etc/apt/preferences.d/jetpack; \
+    # 목록에 없는 L4T 패키지(firmware, nvsci 등)도 목록의 L4T 버전에 맞춘다. \
+    L4T=$(sed -n 's/^nvidia-l4t-core=//p' /tmp/jetpack.list); \
+    printf 'Package: nvidia-l4t-*\nPin: version %s\nPin-Priority: 1001\n' "$L4T" \
+        >> $A/etc/apt/preferences.d/jetpack; \
     APT="apt-get -o Dir=$A -o Dir::State::status=$A/var/lib/dpkg/status -o APT::Architecture=arm64 \
          -o APT::Architectures::=arm64 -o Debug::NoLocking=1 -o APT::Get::AllowUnauthenticated=false"; \
     $APT update; \
     $APT install -y --download-only --no-install-recommends $(grep -vE '^(#|$)' /tmp/sysroot-packages.txt); \
     for deb in $A/var/cache/apt/archives/*.deb; do dpkg-deb -x "$deb" $S; done; \
     echo "unpacked $(ls $A/var/cache/apt/archives/*.deb | wc -l) packages"; \
-    echo "# R36 (release), REVISION: 5.2, BOARD: generic, EABI: aarch64" > $S/etc/nv_tegra_release; \
+    echo "# R36 (release), REVISION: 5.0, BOARD: generic, EABI: aarch64" > $S/etc/nv_tegra_release; \
     bash /tmp/fix-sysroot-links.sh $S; \
     rm -rf $A /tmp/jetpack.list /tmp/sysroot-packages.txt /tmp/fix-sysroot-links.sh \
            $S/usr/share/doc $S/usr/share/man $S/usr/share/locale $S/usr/local/cuda-12.6/doc
