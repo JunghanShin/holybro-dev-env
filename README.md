@@ -35,7 +35,7 @@ Windows PC
 
 Jetson과 같은 Ubuntu 22.04와 같은 라이브러리 버전으로 빌드해야, glibc나 라이브러리 차이로 실행이 안 되는 문제를 피할 수 있습니다.
 
-보드 쪽도 같은 버전이어야 합니다. Holybro 캐리어 보드는 [holybro-build-image](https://github.com/JunghanShin/holybro-build-image)로 이미지를 만들면 같은 목록(`jetpack-6.2.2.list`)으로 JetPack 런타임이 들어갑니다. 다른 보드는 `sudo apt install nvidia-jetpack-runtime=6.2.2+b24`처럼 **버전을 지정해** 설치합니다. NVIDIA 저장소에는 6.2.3도 있어서 버전을 빼면 다른 버전이 설치됩니다.
+보드 쪽도 같은 버전이어야 합니다. Holybro 캐리어 보드는 [holybro-build-image](https://github.com/JunghanShin/holybro-build-image)로 이미지를 만들면 같은 목록(`jetpack-6.2.2.list`)으로 JetPack 런타임이 들어갑니다. 다른 보드는 [Jetson에 JetPack 런타임 설치](#jetson에-jetpack-런타임-설치)대로 6.2.2 고정 파일을 넣고 설치합니다. NVIDIA 저장소에는 6.2.3도 있어서 고정하지 않으면 설치가 실패하거나 다른 버전이 설치됩니다.
 
 ## 지원 범위
 
@@ -138,11 +138,22 @@ ssh user@<JETSON_IP> /home/user/hello/hello
 
 ### Jetson에 JetPack 런타임 설치
 
-JetPack 라이브러리를 쓰는 프로그램을 **실행**하려면 Jetson에도 같은 버전의 런타임이 있어야 합니다. L4T만 설치된 보드에는 TensorRT, cuDNN, VPI, OpenCV, CUDA 런타임이 없습니다. Jetson에서 한 번 설치합니다.
+JetPack 라이브러리를 쓰는 프로그램을 **실행**하려면 Jetson에도 같은 버전의 런타임이 있어야 합니다. L4T만 설치된 보드에는 TensorRT, cuDNN, VPI, OpenCV, CUDA 런타임이 없습니다.
 
+NVIDIA 저장소에는 JetPack 6.2.3도 있어서, `nvidia-jetpack-runtime=6.2.2+b24`처럼 버전을 지정해도 하위 패키지가 6.2.3으로 잡혀 설치가 실패합니다. 먼저 `board/jetpack-6.2.2.pref`(6.2.2 버전 고정 파일)를 보드에 넣고 설치합니다. L4T 패키지는 고정하지 않으므로 L4T 36.5.x 보드면 됩니다.
+
+PC에서 고정 파일을 보드로 복사합니다.
 ```bash
-sudo apt update && sudo apt install nvidia-jetpack-runtime=6.2.2+b24
+scp board/jetpack-6.2.2.pref dev@<Jetson IP>:/tmp/
 ```
+Jetson에서 설치합니다.
+```bash
+sudo cp /tmp/jetpack-6.2.2.pref /etc/apt/preferences.d/ && sudo apt update && sudo apt install nvidia-jetpack-runtime=6.2.2+b24
+```
+
+- 파일 이름은 `.pref`로 끝나야 합니다. 다른 확장자는 apt가 읽지 않습니다.
+- 고정 파일은 보드에 남겨 둡니다. `apt upgrade`를 해도 6.2.2에 머뭅니다.
+- Holybro 캐리어 보드는 holybro-build-image로 만든 이미지에 런타임과 고정 파일이 이미 들어 있습니다.
 
 CUDA 런타임(cudart)은 정적 링크하면 설치 없이도 실행됩니다. GPU 드라이버(`libcuda`)와 Multimedia API 런타임은 L4T에 들어 있습니다. `jetpack-check`의 `check-cuda`는 런타임 없이, `check-libs`는 런타임을 설치한 뒤 실행됩니다.
 
@@ -160,6 +171,7 @@ jetson-dev-env/
 │  ├─ Dockerfile              # 빌드 환경 정의
 │  ├─ jetpack-6.2.2.list      # JetPack 패키지 버전 고정 목록
 │  └─ sysroot-packages.txt    # sysroot에 넣는 패키지
+├─ board/jetpack-6.2.2.pref  # Jetson에 넣는 JetPack 6.2.2 apt 버전 고정 파일
 ├─ cmake/jetson-toolchain.cmake  # 컴파일러, sysroot, CUDA, pkg-config 설정
 └─ template/
    ├─ hello/                  # 가장 단순한 C++ 프로젝트

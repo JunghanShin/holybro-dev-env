@@ -1,0 +1,480 @@
+# JetPack 6.2.2 package versions, generated from docker/jetpack-6.2.2.list (without nvidia-l4t-*).
+# L4T packages are not pinned here: this board stays on its installed L4T 36.5.x.
+# Delete this file to allow upgrades to a newer JetPack.
+
+Package: cuda-cccl-12-6
+Pin: version 12.6.37-1
+Pin-Priority: 1001
+
+Package: cuda-command-line-tools-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-compiler-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-crt-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-cudart-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-cudart-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-cuobjdump-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-cupti-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-cupti-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-cuxxfilt-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-documentation-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-driver-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-gdb-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-libraries-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-libraries-dev-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-nsight-compute-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-nvcc-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvdisasm-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvml-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvprune-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvrtc-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvrtc-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvtx-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-nvvm-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-profiler-api-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-runtime-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-sanitizer-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-toolkit-12-6-config-common
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-toolkit-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-toolkit-12-config-common
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-toolkit-config-common
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: cuda-tools-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: cuda-visual-tools-12-6
+Pin: version 12.6.11-1
+Pin-Priority: 1001
+
+Package: gds-tools-12-6
+Pin: version 1.11.1.6-1
+Pin-Priority: 1001
+
+Package: libcublas-12-6
+Pin: version 12.6.1.4-1
+Pin-Priority: 1001
+
+Package: libcublas-dev-12-6
+Pin: version 12.6.1.4-1
+Pin-Priority: 1001
+
+Package: libcudla-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: libcudla-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: libcudnn9-cuda-12
+Pin: version 9.3.0.75-1
+Pin-Priority: 1001
+
+Package: libcudnn9-dev-cuda-12
+Pin: version 9.3.0.75-1
+Pin-Priority: 1001
+
+Package: libcudnn9-samples
+Pin: version 9.3.0.75-1
+Pin-Priority: 1001
+
+Package: libcufft-12-6
+Pin: version 11.2.6.59-1
+Pin-Priority: 1001
+
+Package: libcufft-dev-12-6
+Pin: version 11.2.6.59-1
+Pin-Priority: 1001
+
+Package: libcufile-12-6
+Pin: version 1.11.1.6-1
+Pin-Priority: 1001
+
+Package: libcufile-dev-12-6
+Pin: version 1.11.1.6-1
+Pin-Priority: 1001
+
+Package: libcurand-12-6
+Pin: version 10.3.7.68-1
+Pin-Priority: 1001
+
+Package: libcurand-dev-12-6
+Pin: version 10.3.7.68-1
+Pin-Priority: 1001
+
+Package: libcusolver-12-6
+Pin: version 11.6.4.69-1
+Pin-Priority: 1001
+
+Package: libcusolver-dev-12-6
+Pin: version 11.6.4.69-1
+Pin-Priority: 1001
+
+Package: libcusparse-12-6
+Pin: version 12.5.3.3-1
+Pin-Priority: 1001
+
+Package: libcusparse-dev-12-6
+Pin: version 12.5.3.3-1
+Pin-Priority: 1001
+
+Package: libnpp-12-6
+Pin: version 12.3.1.54-1
+Pin-Priority: 1001
+
+Package: libnpp-dev-12-6
+Pin: version 12.3.1.54-1
+Pin-Priority: 1001
+
+Package: libnvfatbin-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: libnvfatbin-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: libnvidia-container-tools
+Pin: version 1.16.2-1
+Pin-Priority: 1001
+
+Package: libnvidia-container1
+Pin: version 1.16.2-1
+Pin-Priority: 1001
+
+Package: libnvinfer-bin
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-dispatch-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-dispatch10
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-headers-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-headers-plugin-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-lean-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-lean10
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-plugin-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-plugin10
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-samples
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-vc-plugin-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer-vc-plugin10
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvinfer10
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvjitlink-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: libnvjitlink-dev-12-6
+Pin: version 12.6.68-1
+Pin-Priority: 1001
+
+Package: libnvonnxparsers-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvonnxparsers10
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: libnvvpi3
+Pin: version 3.2.4
+Pin-Priority: 1001
+
+Package: libopencv-dev
+Pin: version 4.8.0-1-g6371ee1
+Pin-Priority: 1001
+
+Package: libopencv-python
+Pin: version 4.8.0-1-g6371ee1
+Pin-Priority: 1001
+
+Package: libopencv-samples
+Pin: version 4.8.0-1-g6371ee1
+Pin-Priority: 1001
+
+Package: libopencv
+Pin: version 4.8.0-1-g6371ee1
+Pin-Priority: 1001
+
+Package: libxcb-cursor0
+Pin: version 0.1.1-4ubuntu1
+Pin-Priority: 1001
+
+Package: libxcb-icccm4-dev
+Pin: version 0.4.1-1.1build2
+Pin-Priority: 1001
+
+Package: libxcb-xinerama0
+Pin: version 1.14-3ubuntu3
+Pin-Priority: 1001
+
+Package: libxcb-xinput0
+Pin: version 1.14-3ubuntu3
+Pin-Priority: 1001
+
+Package: nsight-compute-2024.3.1
+Pin: version 2024.3.1.2-1
+Pin-Priority: 1001
+
+Package: nsight-graphics-for-embeddedlinux-2024.2.0.0
+Pin: version 2024.2.0.0
+Pin-Priority: 1001
+
+Package: nsight-systems-2024.5.4
+Pin: version 2024.5.4.34-245434855735v0
+Pin-Priority: 1001
+
+Package: nvidia-container-toolkit-base
+Pin: version 1.16.2-1
+Pin-Priority: 1001
+
+Package: nvidia-container-toolkit
+Pin: version 1.16.2-1
+Pin-Priority: 1001
+
+Package: nvidia-container
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-cuda-dev
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-cuda
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-cudnn-dev
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-cudnn
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-cupva
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-jetpack-dev
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-jetpack-runtime
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-nsight-graphics
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-nsight-systems
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-opencv-dev
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-opencv
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-tensorrt-dev
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-tensorrt
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-vpi-dev
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: nvidia-vpi
+Pin: version 6.2.2+b24
+Pin-Priority: 1001
+
+Package: opencv-licenses
+Pin: version 4.8.0-1-g6371ee1
+Pin-Priority: 1001
+
+Package: opencv-samples-data
+Pin: version 4.8.0-1-g6371ee1
+Pin-Priority: 1001
+
+Package: pva-allow-2
+Pin: version 2.0.5
+Pin-Priority: 1001
+
+Package: pva-sdk-2.5-l4t
+Pin: version 2.5.4
+Pin-Priority: 1001
+
+Package: python3-libnvinfer-dev
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: python3-libnvinfer-dispatch
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: python3-libnvinfer-lean
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: python3-libnvinfer
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: python3.10-vpi3
+Pin: version 3.2.4
+Pin-Priority: 1001
+
+Package: tensorrt-libs
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: tensorrt
+Pin: version 10.3.0.30-1+cuda12.5
+Pin-Priority: 1001
+
+Package: vpi3-dev
+Pin: version 3.2.4
+Pin-Priority: 1001
+
+Package: vpi3-python-src
+Pin: version 3.2.4
+Pin-Priority: 1001
+
+Package: vpi3-samples
+Pin: version 3.2.4
+Pin-Priority: 1001
+
