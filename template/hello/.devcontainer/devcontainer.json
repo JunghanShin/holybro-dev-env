@@ -1,6 +1,6 @@
 {
   "name": "Jetson cross build",
-  "image": "jetson-dev:1.0",
+  "image": "jetson-dev:2.0",
   "workspaceMount": "source=${localWorkspaceFolder},target=/work,type=bind",
   "workspaceFolder": "/work",
   "remoteUser": "dev",

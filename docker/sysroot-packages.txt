@@ -1,0 +1,40 @@
+# Jetson sysroot에 넣는 ARM64 패키지. 의존 패키지는 apt가 함께 받는다.
+# 버전은 jetpack-*.list로 고정된다.
+
+# C/C++ 기본
+libc6-dev
+libstdc++-11-dev
+
+# L4T: GPU 드라이버(libcuda), Multimedia API 런타임(libnvbufsurface 등)
+nvidia-l4t-core
+nvidia-l4t-cuda
+nvidia-l4t-multimedia
+nvidia-l4t-gstreamer
+nvidia-l4t-jetson-multimedia-api
+# libnvvpi가 쓰지만 의존 패키지로 선언되지 않은 L4T 라이브러리 (libnvpvaintf, libEGL_nvidia)
+nvidia-l4t-pva
+nvidia-l4t-3d-core
+
+# CUDA
+cuda-cudart-dev-12-6
+cuda-driver-dev-12-6
+cuda-libraries-dev-12-6
+
+# TensorRT, cuDNN
+# libnvinfer가 쓰는 DLA 컴파일러(nvidia-l4t-dla-compiler)는 의존 패키지로 선언되어 있지 않아 따로 적는다.
+libcudnn9-dev-cuda-12
+libnvinfer-dev
+libnvinfer-plugin-dev
+libnvonnxparsers-dev
+nvidia-l4t-dla-compiler
+
+# VPI, OpenCV, GStreamer
+# 아래 두 패키지도 의존 패키지로 선언되어 있지 않아 따로 적는다.
+#   pva-sdk-2.5-l4t: libnvvpi가 쓰는 PVA 런타임
+#   libopencv: NVIDIA의 libopencv-dev가 가리키는 실제 라이브러리
+vpi3-dev
+pva-sdk-2.5-l4t
+libopencv
+libopencv-dev
+libgstreamer1.0-dev
+libgstreamer-plugins-base1.0-dev

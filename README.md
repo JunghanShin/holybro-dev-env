@@ -1,35 +1,52 @@
 # jetson-dev-env
 
-Windows PC에서 Jetson용 C/C++ 프로그램을 크로스 컴파일하는 환경입니다. 이 저장소를 받아 설치하면 팀원 모두 같은 도구로 빌드합니다.
+Windows PC에서 Jetson용 C/C++/CUDA 프로그램을 개발하는 환경입니다. JetPack 라이브러리가 들어 있어 CUDA, TensorRT, Multimedia API 등을 쓰는 프로그램도 PC에서 빌드합니다. 이 저장소를 받아 설치하면 팀원 모두 같은 도구와 같은 라이브러리 버전으로 빌드합니다.
 
 ```text
 Windows PC
   └─ WSL2 또는 Git Bash
-       └─ Docker 컨테이너 (Ubuntu 22.04, aarch64 크로스 컴파일러)
-             │ jetson-build
-             ▼
-          ARM64 실행 파일 ── jetson-deploy ──► Jetson에서 실행
+       └─ Docker 컨테이너 (Ubuntu 22.04)
+            ├─ aarch64 크로스 컴파일러, CUDA 크로스 컴파일러(nvcc)
+            └─ Jetson sysroot (JetPack 6.2.2 헤더·라이브러리)
+                  │ jetson-build
+                  ▼
+               ARM64 실행 파일 ── jetson-deploy ──► Jetson에서 실행
 ```
 
 | 항목 | 값 |
 |---|---|
-| 대상 | Jetson Orin NX, JetPack 6.2.x, Ubuntu 22.04, aarch64 |
-| 컴파일러 | `aarch64-linux-gnu-g++` 11.4 |
-| 도구 | CMake 3.22, Ninja, QEMU(ARM64 시험 실행) |
+| 대상 | Jetson Orin 계열(GPU `sm_87`), **JetPack 6.2.2** (L4T r36.5), Ubuntu 22.04, aarch64 |
+| 컴파일러 | `aarch64-linux-gnu-g++` 11.4, CUDA `nvcc` 12.6 |
+| 도구 | CMake 3.22, Ninja, pkg-config, QEMU(ARM64 시험 실행) |
 
-Jetson과 같은 Ubuntu 22.04에서 빌드해야 glibc 차이로 실행이 안 되는 문제를 피할 수 있습니다.
+### 들어 있는 JetPack 라이브러리
+
+| 라이브러리 | 버전 | sysroot 경로 |
+|---|---|---|
+| CUDA (cudart, cuBLAS, cuFFT, NPP 등) | 12.6 | `/usr/local/cuda-12.6` |
+| TensorRT | 10.3.0 | `/usr/include/aarch64-linux-gnu`, `/usr/lib/aarch64-linux-gnu` |
+| cuDNN | 9.3.0 | 위와 같음 |
+| VPI | 3.2.4 | `/opt/nvidia/vpi3` |
+| Multimedia API (NvBufSurface, V4L2 인코더·디코더) | 36.5.2 | `/usr/src/jetson_multimedia_api`, `/usr/lib/aarch64-linux-gnu/nvidia` |
+| OpenCV (NVIDIA 빌드) | 4.8.0 | `/usr/include/opencv4` |
+| GStreamer | 1.20 | pkg-config `gstreamer-1.0` |
+
+버전은 `docker/jetpack-6.2.2.list`에 고정되어 있습니다. Jetson에서 `apt-get -s install nvidia-jetpack=6.2.2+b24`로 얻은 목록입니다. sysroot는 컨테이너의 `/opt/jetson/sysroot`에 있고, `jetson-build`가 자동으로 사용합니다.
+
+Jetson과 같은 Ubuntu 22.04와 같은 라이브러리 버전으로 빌드해야, glibc나 라이브러리 차이로 실행이 안 되는 문제를 피할 수 있습니다.
 
 ## 지원 범위
 
 | 항목 | 지원 | 비고 |
 |---|---|---|
-| JetPack 6.x (Ubuntu 22.04) | 예 | |
-| JetPack 5.x 이하 (Ubuntu 20.04 이하) | **아니요** | glibc가 낮아 여기서 빌드한 파일이 실행되지 않음 |
+| JetPack 6.2.2 (L4T r36.5) | 예 | |
+| 다른 JetPack 6.x | 확인 필요 | 라이브러리 버전이 다르면 `jetpack-*.list`를 다시 만듦 |
+| JetPack 5.x 이하 | **아니요** | Ubuntu 20.04 이하라 glibc가 낮음 |
 | CMake 프로젝트 | 예 | 실행 파일에 `install` 규칙 필요 |
-| Makefile 등 다른 빌드 방식 | 직접 | `jetson-env shell`에서 `aarch64-linux-gnu-g++`로 빌드 |
-| 표준 C/C++, Linux 시스템 API | 예 | |
-| 외부 라이브러리 (OpenCV, Boost, GStreamer 등) | **아직 아니요** | 이미지에 ARM64판이 없음. sysroot 필요 |
-| Jetson 전용 (CUDA, TensorRT, Multimedia API, VPI) | **아직 아니요** | sysroot 필요. 지정 기능만 있고 시험하지 않음 |
+| Makefile 등 다른 빌드 방식 | 직접 | `jetson-env shell`에서 `aarch64-linux-gnu-g++ --sysroot=/opt/jetson/sysroot`로 빌드 |
+| C/C++, CUDA | 예 | |
+| JetPack 라이브러리 | 예 | 위 표 |
+| 그 밖의 라이브러리 | 프로젝트별 | 소스째 함께 빌드하거나, `.so`를 실행 파일과 함께 배포 |
 | 원격 디버깅 | **아직 아니요** | `gdb-multiarch`만 포함 |
 
 ## 설치
@@ -63,7 +80,7 @@ git clone https://github.com/JunghanShin/jetson-dev-env.git ~/jetson-dev-env
 ```
 ### 4. 설치 실행
 
-명령을 등록하고 Docker 이미지를 빌드합니다. 처음에는 약 5분 걸립니다.
+명령을 등록하고 Docker 이미지를 빌드합니다. NVIDIA와 Ubuntu 저장소에서 JetPack 패키지를 약 2.7GB 내려받습니다. 처음에는 20분 안팎 걸리고, 이미지는 약 17GB입니다.
 
 ```bash
 ~/jetson-dev-env/install.sh
@@ -84,6 +101,12 @@ jetson-build --test
 ```
 
 `100% tests passed`와 `ARM aarch64`가 표시되면 환경이 갖춰진 것입니다. 여기까지는 Jetson이 없어도 됩니다.
+
+JetPack 라이브러리 빌드는 `template/jetpack-check`로 확인합니다. CUDA 커널과 각 라이브러리를 링크한 실행 파일 두 개가 나오면 됩니다.
+
+```bash
+cp -r ~/jetson-dev-env/template/jetpack-check ~/jetpack-check && cd ~/jetpack-check && jetson-build
+```
 
 ## 선택: Jetson에서 실행해 보기
 
@@ -111,6 +134,16 @@ ssh user@<JETSON_IP> /home/user/hello/hello
 
 `hello from ... (aarch64)`가 출력되면 Jetson에서도 정상 실행되는 것입니다.
 
+### Jetson에 JetPack 런타임 설치
+
+JetPack 라이브러리를 쓰는 프로그램을 **실행**하려면 Jetson에도 같은 버전의 런타임이 있어야 합니다. L4T만 설치된 보드에는 TensorRT, cuDNN, VPI, OpenCV, CUDA 런타임이 없습니다. Jetson에서 한 번 설치합니다.
+
+```bash
+sudo apt update && sudo apt install nvidia-jetpack-runtime=6.2.2+b24
+```
+
+CUDA 런타임(cudart)은 정적 링크하면 설치 없이도 실행됩니다. GPU 드라이버(`libcuda`)와 Multimedia API 런타임은 L4T에 들어 있습니다. `jetpack-check`의 `check-cuda`는 런타임 없이, `check-libs`는 런타임을 설치한 뒤 실행됩니다.
+
 ## 구성
 
 ```text
@@ -121,9 +154,14 @@ jetson-dev-env/
 │  ├─ jetson-env              # 이미지, 컨테이너 관리
 │  ├─ jetson-build            # 크로스 컴파일, 시험
 │  └─ jetson-deploy           # Jetson에 복사
-├─ docker/Dockerfile          # 빌드 환경 정의
-├─ cmake/jetson-toolchain.cmake
-└─ template/hello/            # 새 프로젝트 시작용 예제
+├─ docker/
+│  ├─ Dockerfile              # 빌드 환경 정의
+│  ├─ jetpack-6.2.2.list      # JetPack 패키지 버전 고정 목록
+│  └─ sysroot-packages.txt    # sysroot에 넣는 패키지
+├─ cmake/jetson-toolchain.cmake  # 컴파일러, sysroot, CUDA, pkg-config 설정
+└─ template/
+   ├─ hello/                  # 가장 단순한 C++ 프로젝트
+   └─ jetpack-check/          # CUDA와 JetPack 라이브러리 사용 예제
 ```
 
 `install.sh`는 `~/.local/bin`에 명령 3개를 등록합니다. 시스템 폴더는 건드리지 않습니다. 명령은 현재 폴더의 프로젝트를 컨테이너에 마운트해 빌드하므로, 어느 프로젝트에서든 같은 명령을 씁니다.
@@ -174,15 +212,39 @@ Dev Containers 확장을 설치합니다. `jetson-dev` 이미지가 빌드된 �
 
 Dockerfile은 Ubuntu 22.04 저장소의 최신 패키지를 받으므로, 만드는 시점에 따라 패치 버전이 조금 다를 수 있습니다. 완전히 같게 맞추려면 한 사람이 만든 이미지를 `jetson-env save`로 전달합니다.
 
-## Jetson 전용 라이브러리 (sysroot)
+## JetPack 라이브러리 사용
 
-CUDA, Multimedia API, TensorRT, xiAPI처럼 Jetson의 헤더와 라이브러리가 필요한 프로젝트는 Jetson에서 복사한 sysroot를 지정합니다. sysroot는 용량이 커서 이 저장소에 넣지 않습니다.
+`CMakeLists.txt`에서 평소처럼 찾으면 sysroot에서 찾아집니다. 전체 예제는 `template/jetpack-check/CMakeLists.txt`입니다.
 
-```bash
-JETSON_SYSROOT=/path/to/sysroot jetson-build
+```cmake
+project(my_app LANGUAGES CXX CUDA)          # CUDA를 쓰면 언어에 추가
+
+find_package(CUDAToolkit REQUIRED)          # CUDA::cudart, CUDA::cublas ...
+find_package(OpenCV REQUIRED)               # ${OpenCV_LIBS}
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GST REQUIRED IMPORTED_TARGET gstreamer-1.0)   # PkgConfig::GST
+
+find_library(NVINFER nvinfer REQUIRED)       # TensorRT
+find_library(NVBUF nvbufsurface PATHS /usr/lib/aarch64-linux-gnu/nvidia REQUIRED)
+find_path(NVBUF_INCLUDE nvbufsurface.h PATHS /usr/src/jetson_multimedia_api/include REQUIRED)
+find_library(VPI nvvpi PATHS /opt/nvidia/vpi3/lib/aarch64-linux-gnu REQUIRED)
 ```
 
-이 경로는 아직 시험하지 않았습니다.
+- 경로는 Jetson 기준으로 적습니다. 빌드할 때는 sysroot 아래에서 찾아집니다.
+- CUDA 아키텍처는 기본 `sm_87`(Orin)입니다. 바꾸려면 `CMAKE_CUDA_ARCHITECTURES`를 지정합니다.
+- GPU를 쓰는 코드는 PC의 QEMU 시험에서 동작하지 않습니다. Jetson에서 실행해 확인합니다.
+- 다른 sysroot를 쓰려면 `JETSON_SYSROOT=/path jetson-build`로 지정합니다.
+
+## JetPack 버전 변경
+
+1. Jetson에서 새 버전의 패키지 목록을 얻습니다.
+
+```bash
+apt-get -s install nvidia-jetpack=<버전> | awk '/^Inst/{print $2"="$3}' | tr -d '('
+```
+
+2. 그 결과로 `docker/jetpack-<버전>.list`를 만들고, `Dockerfile`의 목록 파일 이름과 L4T 저장소(`L4T_RELEASE`), CUDA 크로스 컴파일러 버전을 맞춥니다.
+3. `VERSION`을 올리고 이미지를 다시 빌드합니다.
 
 ## 문제 해결
 
