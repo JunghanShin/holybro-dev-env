@@ -291,21 +291,6 @@ Ubuntu 패키지 추가 절차:
    ```
 5. Jetson에서 `ldd <실행 파일> | grep "not found"`가 아무것도 출력하지 않는지 확인합니다.
 
-## 성능 분석
-
-CPU·GPU·메모리 사용량을 한눈에 보려면 Jetson에서 `tegrastats`를 씁니다(기본 포함).
-
-GPU 커널, CUDA 호출, 스레드 시간 분석은 NVIDIA Nsight Systems를 씁니다. 실행용 이미지에는 없으므로 필요할 때 Jetson에 설치합니다. 버전 고정 파일(`/etc/apt/preferences.d/jetpack-6.2.2.pref`)이 있으면 JetPack 6.2.2에 맞는 버전이 설치됩니다.
-
-```bash
-sudo apt install nvidia-nsight-systems=6.2.2+b24
-```
-```bash
-nsys profile -o myapp-report ./myapp
-```
-
-만들어진 `myapp-report.nsys-rep`를 PC로 복사해 [Nsight Systems](https://developer.nvidia.com/nsight-systems)(Windows용) 화면에서 엽니다.
-
 ## 환경 변경
 
 1. `docker/Dockerfile`이나 `cmake/`를 고칩니다.
