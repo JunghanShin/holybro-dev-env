@@ -74,7 +74,13 @@ run_in_container() {
             ;;
     esac
 
+    # JETSON_DOCKER_ARGS: 명령별 추가 옵션(jetson-debug의 네트워크 등).
+    # compile_commands.json은 편집기 자동 완성용으로 항상 만든다(CMake 환경 변수).
+    local extra_args=()
+    [ -n "${JETSON_DOCKER_ARGS:-}" ] && read -r -a extra_args <<< "$JETSON_DOCKER_ARGS"
+
     docker run --rm ${tty_args[@]+"${tty_args[@]}"} ${user_args[@]+"${user_args[@]}"} \
+        ${extra_args[@]+"${extra_args[@]}"} -e CMAKE_EXPORT_COMPILE_COMMANDS=ON \
         -v "$mount_src:/work" -w "/work${relative:+/$relative}" \
         ${JETSON_SYSROOT:+-v "$JETSON_SYSROOT:/sysroot:ro" -e JETSON_SYSROOT=/sysroot} \
         "$IMAGE" "$@"

@@ -132,7 +132,7 @@ ssh-keygen -t ed25519
 cat ~/.ssh/id_ed25519.pub | ssh user@<JETSON_IP> "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 ```
 
-SSH 포트가 22가 아니면 두 명령 모두 `-p 포트`를 붙입니다(`jetson-deploy -p 10001 ...`, `ssh -p 10001 ...`).
+SSH 포트가 22가 아니면 두 명령 모두 `-p 포트`를 붙입니다(`jetson-deploy -p 2222 ...`, `ssh -p 2222 ...`).
 
 ```bash
 jetson-deploy user@<JETSON_IP> /home/user/hello
@@ -175,7 +175,8 @@ jetson-dev-env/
 ├─ bin/
 │  ├─ jetson-env              # 이미지, 컨테이너 관리
 │  ├─ jetson-build            # 크로스 컴파일, 시험
-│  └─ jetson-deploy           # Jetson에 복사
+│  ├─ jetson-deploy           # Jetson에 복사
+│  └─ jetson-debug            # Jetson 프로그램 원격 디버깅(gdbserver + gdb-multiarch)
 ├─ docker/
 │  ├─ Dockerfile              # 빌드 환경 정의
 │  ├─ jetpack-6.2.2.list      # JetPack 패키지 버전 고정 목록
@@ -187,7 +188,7 @@ jetson-dev-env/
    └─ jetpack-check/          # CUDA와 JetPack 라이브러리 사용 예제
 ```
 
-`install.sh`는 `~/.local/bin`에 명령 3개를 등록합니다. 시스템 폴더는 건드리지 않습니다. 명령은 현재 폴더의 프로젝트를 컨테이너에 마운트해 빌드하므로, 어느 프로젝트에서든 같은 명령을 씁니다.
+`install.sh`는 `~/.local/bin`에 명령 4개(`jetson-env`, `jetson-build`, `jetson-deploy`, `jetson-debug`)를 등록합니다. 시스템 폴더는 건드리지 않습니다. 명령은 현재 폴더의 프로젝트를 컨테이너에 마운트해 빌드하므로, 어느 프로젝트에서든 같은 명령을 씁니다.
 
 ## 사용법
 
@@ -198,11 +199,12 @@ jetson-dev-env/
 | `jetson-build --native --debug --test` | PC용 디버그 빌드와 시험 |
 | `jetson-build --clean` | 빌드 폴더를 지우고 빌드 |
 | `jetson-deploy [-p PORT] USER@HOST DIR` | 실행 파일을 Jetson에 복사. 실행 중인 파일도 교체 가능 |
+| `jetson-debug [-p PORT] USER@HOST PROGRAM [-- 인자]` | Jetson의 프로그램을 PC의 gdb로 디버깅 ([원격 디버깅](#원격-디버깅)) |
 | `jetson-env shell` | 컨테이너 셸 |
 | `jetson-env check` | 도구 버전 확인 |
 | `jetson-env save FILE`, `load FILE` | 이미지를 파일로 전달 |
 
-결과는 `build/<jetson|native>/install/bin/`에 생깁니다.
+결과는 `build/<jetson|native>/install/bin/`에 생깁니다. 편집기 자동 완성용 `build/<jetson|native>/compile_commands.json`도 함께 만들어집니다.
 
 ## 새 프로젝트 만들기
 
@@ -225,6 +227,84 @@ my-repo/
 ## VS Code
 
 Dev Containers 확장과 WSL 확장을 설치합니다. WSL 안의 Docker 엔진을 쓰므로 VS Code 설정에서 **Dev › Containers: Execute In WSL**을 켭니다(Docker Desktop을 쓰면 필요 없음). `jetson-dev` 이미지가 빌드된 상태에서 프로젝트를 열고 **Reopen in Container**를 실행합니다. 프로젝트에 `.devcontainer/`가 있어야 하며, 템플릿에 포함되어 있습니다. 컨테이너 터미널에서도 `jetson-build`를 쓸 수 있습니다.
+
+**자동 완성(IntelliSense):** `jetson-build`가 만든 `build/jetson/compile_commands.json`을 C/C++ 확장이 읽어, CUDA·TensorRT 같은 Jetson sysroot 헤더도 찾습니다. 템플릿의 `.devcontainer/devcontainer.json`에 설정이 들어 있습니다. 기존 프로젝트는 아래 설정을 `.devcontainer/devcontainer.json`의 `customizations.vscode.settings`에 넣습니다.
+
+```json
+"C_Cpp.default.compileCommands": "${workspaceFolder}/build/jetson/compile_commands.json",
+"C_Cpp.default.intelliSenseMode": "linux-gcc-arm64"
+```
+
+처음 열었을 때 빨간 줄이 보이면 `jetson-build`를 한 번 실행합니다. 경로가 컨테이너 기준(`/work`, `/opt/jetson/sysroot`)이라 **Reopen in Container로 열었을 때** 동작합니다.
+
+## 원격 디버깅
+
+Jetson에서 실행 중인 프로그램에 PC의 gdb로 중단점을 걸고 한 줄씩 실행합니다. SSH 하나로 Jetson에 `gdbserver`를 띄우고 포트를 PC로 가져오므로, SSH 말고 따로 열 포트는 없습니다(SSH 포트가 22가 아니면 `-p 포트`). 디버그 정보와 라이브러리는 PC의 빌드 결과와 sysroot에서 읽습니다.
+
+1. 디버그 빌드:
+   ```bash
+   jetson-build --debug
+   ```
+2. Jetson에 복사:
+   ```bash
+   jetson-deploy dev@<Jetson IP> /home/dev/myapp
+   ```
+3. 디버깅 시작. 프로젝트 폴더에서 실행합니다. 프로그램 인자는 `--` 뒤에 씁니다.
+   ```bash
+   jetson-debug dev@<Jetson IP> /home/dev/myapp/myapp -- --config test.json
+   ```
+4. gdb 화면에서 평소처럼 씁니다. 프로그램은 시작 직전에 멈춰 있습니다.
+   ```text
+   (gdb) break main
+   (gdb) continue
+   (gdb) next / step / print 변수 / bt
+   (gdb) quit
+   ```
+   `quit`하면 Jetson의 프로그램과 `gdbserver`도 끝납니다. 프로그램 출력은 같은 터미널에 나옵니다.
+
+- Jetson에 `gdbserver`가 있어야 합니다. holybro-build-image 이미지에는 들어 있고, 없으면 `sudo apt install gdbserver`.
+- 2번에서 복사한 파일과 PC의 `build/jetson/install/bin/`의 파일이 같아야 합니다. 다시 빌드했으면 다시 복사합니다.
+- DURU 워커처럼 Manager가 띄우는 프로그램은, 디버깅하는 동안 Manager에서 그 워커를 멈추고(`POST /workers/<id>/stop`) 위처럼 직접 띄웁니다.
+- 첫 줄에 `channel ... open failed`가 한 번 보이는 것은 gdbserver가 열리기 전의 연결 확인이라 무시합니다.
+
+## 라이브러리 추가
+
+개발 환경에 없는 라이브러리를 쓸 때는 **PC의 sysroot와 Jetson에 같은 버전**이 있어야 합니다. 한쪽에만 있으면 PC에서는 빌드되고 Jetson에서는 `error while loading shared libraries`로 실행되지 않습니다.
+
+| 라이브러리 | 방법 |
+|---|---|
+| 헤더만 있는 라이브러리(Eigen, nlohmann/json 등), 소스로 받는 라이브러리 | 프로젝트에 소스로 넣고 같이 빌드합니다(예: `third_party/`). 정적 링크되므로 Jetson에 설치할 것이 없습니다. **가장 간단합니다** |
+| 제조사 SDK(XIMEA 등) | 그 워커·프로젝트가 SDK 파일을 갖고, 빌드용 헤더·라이브러리와 Jetson 설치를 함께 관리합니다(예: DURU `workers/ximea/install/`) |
+| Ubuntu 패키지(Boost, protobuf 등) | 아래 절차 |
+
+Ubuntu 패키지 추가 절차:
+
+1. Jetson에서 패키지 이름과 버전을 확인합니다.
+   ```bash
+   apt-cache policy libboost-system-dev
+   ```
+2. `docker/sysroot-packages.txt`에 `-dev` 패키지를 추가합니다. Jetson의 버전과 다르게 잡히면 `docker/jetpack-6.2.2.list`에 `이름=버전`으로 고정합니다.
+3. `VERSION`을 올리고 이미지를 다시 빌드합니다(`jetson-env build`). 팀원도 `git pull` 후 다시 빌드합니다.
+4. Jetson에는 같은 버전의 실행용 패키지(`-dev`가 없는 것)를 설치합니다. DURU처럼 설치 스크립트가 있는 프로젝트는 그 스크립트에 넣습니다.
+   ```bash
+   sudo apt install libboost-system1.74.0
+   ```
+5. Jetson에서 `ldd <실행 파일> | grep "not found"`가 아무것도 출력하지 않는지 확인합니다.
+
+## 성능 분석
+
+CPU·GPU·메모리 사용량을 한눈에 보려면 Jetson에서 `tegrastats`를 씁니다(기본 포함).
+
+GPU 커널, CUDA 호출, 스레드 시간 분석은 NVIDIA Nsight Systems를 씁니다. 실행용 이미지에는 없으므로 필요할 때 Jetson에 설치합니다. 버전 고정 파일(`/etc/apt/preferences.d/jetpack-6.2.2.pref`)이 있으면 JetPack 6.2.2에 맞는 버전이 설치됩니다.
+
+```bash
+sudo apt install nvidia-nsight-systems=6.2.2+b24
+```
+```bash
+nsys profile -o myapp-report ./myapp
+```
+
+만들어진 `myapp-report.nsys-rep`를 PC로 복사해 [Nsight Systems](https://developer.nvidia.com/nsight-systems)(Windows용) 화면에서 엽니다.
 
 ## 환경 변경
 

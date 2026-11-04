@@ -9,7 +9,11 @@
       "extensions": [
         "ms-vscode.cpptools",
         "ms-vscode.cmake-tools"
-      ]
+      ],
+      "settings": {
+        "C_Cpp.default.compileCommands": "${workspaceFolder}/build/jetson/compile_commands.json",
+        "C_Cpp.default.intelliSenseMode": "linux-gcc-arm64"
+      }
     }
   }
 }
