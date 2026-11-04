@@ -265,7 +265,6 @@ Jetson에서 실행 중인 프로그램에 PC의 gdb로 중단점을 걸고 한 
 - Jetson에 `gdbserver`가 있어야 합니다. holybro-build-image 이미지에는 들어 있고, 없으면 `sudo apt install gdbserver`.
 - 2번에서 복사한 파일과 PC의 `build/jetson/install/bin/`의 파일이 같아야 합니다. 다시 빌드했으면 다시 복사합니다.
 - DURU 워커처럼 Manager가 띄우는 프로그램은, 디버깅하는 동안 Manager에서 그 워커를 멈추고(`POST /workers/<id>/stop`) 위처럼 직접 띄웁니다.
-- 첫 줄에 `channel ... open failed`가 한 번 보이는 것은 gdbserver가 열리기 전의 연결 확인이라 무시합니다.
 
 ## 라이브러리 추가
 

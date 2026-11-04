@@ -61,22 +61,27 @@ require_docker
 remote_port=2345
 quoted_args=""
 for a in ${program_args[@]+"${program_args[@]}"}; do quoted_args+=" $(printf '%q' "$a")"; done
+# gdbserver 메시지(stderr)는 화면에 보여 주면서 파일에도 남겨, 열렸는지 그 메시지로 판단한다.
+# 포트에 접속해서 확인하면 gdbserver --once가 그 접속을 디버거로 받아 끝나 버린다.
+log="$(mktemp)"
 ssh -p "$port" -o BatchMode=yes -o ExitOnForwardFailure=yes \
     -L "127.0.0.1:$local_port:127.0.0.1:$remote_port" "$host" \
     "command -v gdbserver >/dev/null || { echo 'Jetson에 gdbserver가 없습니다: sudo apt install gdbserver' >&2; exit 1; }
-     exec gdbserver --once 127.0.0.1:$remote_port $(printf '%q' "$remote_program")$quoted_args" &
+     exec gdbserver --once 127.0.0.1:$remote_port $(printf '%q' "$remote_program")$quoted_args" \
+    2> >(tee "$log" >&2) &
 ssh_pid=$!
-trap 'kill "$ssh_pid" 2>/dev/null || true' EXIT
+trap 'kill "$ssh_pid" 2>/dev/null || true; rm -f "$log"' EXIT
 
 # gdbserver가 열릴 때까지 기다린다(최대 15초)
 for _ in $(seq 1 30); do
+    grep -q "Listening on port" "$log" && break
     if ! kill -0 "$ssh_pid" 2>/dev/null; then
         echo "Jetson에서 gdbserver를 시작하지 못했습니다." >&2
         exit 1
     fi
-    if (exec 3<>"/dev/tcp/127.0.0.1/$local_port") 2>/dev/null; then break; fi
     sleep 0.5
 done
+grep -q "Listening on port" "$log" || { echo "gdbserver가 15초 안에 열리지 않았습니다." >&2; exit 1; }
 
 # 컨테이너에서 PC의 local_port로: WSL·Linux의 Docker 엔진은 호스트 네트워크를 같이 쓰고,
 # Windows의 Docker Desktop(Git Bash)은 host.docker.internal이 PC를 가리킨다.
