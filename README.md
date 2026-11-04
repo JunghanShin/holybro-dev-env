@@ -53,42 +53,50 @@ Jetson과 같은 Ubuntu 22.04와 같은 라이브러리 버전으로 빌드해�
 
 ## 설치
 
-### 1. WSL2 설치
+필요한 것은 Windows 10/11 PC 하나입니다. WSL2, Ubuntu, Docker 엔진은 스크립트가 없을 때만 설치합니다. Docker Desktop은 필요 없습니다. Docker Desktop은 회사 규모에 따라 유료라서 쓰지 않고, WSL 안에 무료인 Docker 엔진을 설치합니다.
 
-PowerShell을 관리자 권한으로 열고 실행한 뒤 재부팅합니다.
+### 자동 설치 (권장)
+
+PowerShell에서 설치 스크립트를 받아 실행합니다.
 
 ```powershell
-wsl --install -d Ubuntu-22.04
+irm https://raw.githubusercontent.com/JunghanShin/jetson-dev-env/main/setup.ps1 -OutFile $env:TEMP\jetson-setup.ps1; powershell -ExecutionPolicy Bypass -File $env:TEMP\jetson-setup.ps1
 ```
 
-### 2. Docker 설치
+스크립트는 없는 것만 설치하고, 사람이 해야 할 단계에서 멈춰 안내합니다. 안내를 따른 뒤 **같은 명령을 다시 실행하면 이어서 진행**합니다.
 
-[Docker Desktop](https://www.docker.com/products/docker-desktop/)을 설치하고 실행합니다. Settings → Resources → WSL Integration에서 Ubuntu-22.04를 켭니다.
+| 단계 | 스크립트가 하는 일 | 사람이 할 일 |
+|---|---|---|
+| 1. WSL2 | 없으면 설치 (관리자 창을 스스로 엶) | 관리자 권한 허용, **재부팅** |
+| 2. Ubuntu | WSL에 Ubuntu가 없으면 Ubuntu 22.04 설치. 이미 있으면 그대로 사용 | 처음 실행 때 **리눅스 사용자 이름과 비밀번호** 입력 |
+| 3. 저장소 | Ubuntu 홈(`~/jetson-dev-env`)에 받기. 이미 있으면 최신으로 | — |
+| 4. Docker 엔진 | 없으면 Ubuntu에 설치하고 시작, 사용자를 `docker` 그룹에 추가 | sudo 비밀번호 입력 |
+| 5. 개발 환경 | 명령 등록, 이미지 빌드(JetPack 패키지 약 2.7GB 다운로드, 처음 20분 안팎, 이미지 약 17GB) | — |
 
-> Docker Desktop은 일정 규모 이상의 회사에서 유료입니다. 해당되면 WSL 안에 Docker Engine을 설치합니다.
+끝에 도구 버전이 표시되면 성공입니다. 이후 작업은 **시작 메뉴의 Ubuntu 터미널**에서 합니다.
 
-WSL 터미널에서 확인합니다.
+- WSL의 Ubuntu 버전은 상관없습니다(22.04, 24.04 등). 빌드는 컨테이너 안의 Ubuntu 22.04에서 합니다.
+- 다른 배포판을 쓰려면 `-Distro Ubuntu-24.04`처럼 지정합니다.
+- 저장소를 회사 GitLab으로 옮기면 `-RepoUrl <주소>`로 받을 주소를 바꿉니다.
 
-```bash
-docker info
-```
+### 직접 설치
 
-### 3. 이 저장소 받기
+자동 설치를 쓰지 않을 때입니다.
 
-WSL 터미널에서 실행합니다. 빌드 속도를 위해 `/mnt/d`가 아니라 WSL 안(`~/`)에 둡니다.
+1. 관리자 PowerShell에서 WSL2와 Ubuntu를 설치하고 재부팅합니다.
+   ```powershell
+   wsl --install -d Ubuntu-22.04
+   ```
+2. Ubuntu 터미널에서 저장소를 받습니다. 빌드 속도를 위해 `/mnt/c`가 아니라 WSL 안(`~/`)에 둡니다.
+   ```bash
+   git clone https://github.com/JunghanShin/jetson-dev-env.git ~/jetson-dev-env
+   ```
+3. 설치합니다. Docker가 없으면 Docker 엔진을 설치하고, 이어서 이미지를 빌드합니다.
+   ```bash
+   ~/jetson-dev-env/install.sh
+   ```
 
-```bash
-git clone https://github.com/JunghanShin/jetson-dev-env.git ~/jetson-dev-env
-```
-### 4. 설치 실행
-
-명령을 등록하고 Docker 이미지를 빌드합니다. NVIDIA와 Ubuntu 저장소에서 JetPack 패키지를 약 2.7GB 내려받습니다. 처음에는 20분 안팎 걸리고, 이미지는 약 17GB입니다.
-
-```bash
-~/jetson-dev-env/install.sh
-```
-
-끝에 도구 버전이 표시되면 성공입니다. PATH 안내가 나오면 그대로 따릅니다.
+**Docker Desktop을 이미 쓰고 있다면:** 그대로 씁니다. `install.sh`는 Docker가 동작하면 설치를 건너뜁니다. Docker Desktop이 꺼져 있으면 켜라고 안내하고 멈춥니다. Git Bash에서도 Docker Desktop이 있으면 쓸 수 있습니다.
 
 ## 첫 빌드
 
@@ -161,7 +169,8 @@ CUDA 런타임(cudart)은 정적 링크하면 설치 없이도 실행됩니다. 
 
 ```text
 jetson-dev-env/
-├─ install.sh                 # 명령 등록, 이미지 빌드
+├─ setup.ps1                  # Windows 자동 설치: WSL2, Ubuntu, 저장소, install.sh
+├─ install.sh                 # Docker 엔진(없을 때), 명령 등록, 이미지 빌드
 ├─ VERSION                    # 환경 버전 (이미지 태그)
 ├─ bin/
 │  ├─ jetson-env              # 이미지, 컨테이너 관리
@@ -215,7 +224,7 @@ my-repo/
 
 ## VS Code
 
-Dev Containers 확장을 설치합니다. `jetson-dev` 이미지가 빌드된 상태에서 프로젝트를 열고 **Reopen in Container**를 실행합니다. 프로젝트에 `.devcontainer/`가 있어야 하며, 템플릿에 포함되어 있습니다. 컨테이너 터미널에서도 `jetson-build`를 쓸 수 있습니다.
+Dev Containers 확장과 WSL 확장을 설치합니다. WSL 안의 Docker 엔진을 쓰므로 VS Code 설정에서 **Dev › Containers: Execute In WSL**을 켭니다(Docker Desktop을 쓰면 필요 없음). `jetson-dev` 이미지가 빌드된 상태에서 프로젝트를 열고 **Reopen in Container**를 실행합니다. 프로젝트에 `.devcontainer/`가 있어야 하며, 템플릿에 포함되어 있습니다. 컨테이너 터미널에서도 `jetson-build`를 쓸 수 있습니다.
 
 ## 환경 변경
 
@@ -264,7 +273,8 @@ apt-get -s install nvidia-jetpack=<버전> | awk '/^Inst/{print $2"="$3}' | tr -
 
 | 증상 | 조치 |
 |---|---|
-| `Docker에 연결할 수 없습니다` | Docker를 실행하고 WSL Integration 확인 |
+| `Docker에 연결할 수 없습니다` | WSL Docker 엔진: Ubuntu 터미널에서 `sudo service docker start`. 한 번 `install.sh`를 다시 실행하면 자동 시작도 설정됨. Docker Desktop: 실행하고 WSL Integration 확인 |
+| `permission denied ... docker.sock` | `docker` 그룹이 아직 적용 안 됨. Ubuntu 터미널을 닫고 다시 열기 |
 | `jetson-build: command not found` | `install.sh`의 PATH 안내 실행 후 터미널 다시 열기 |
 | `bad interpreter` | 줄바꿈이 CRLF로 바뀜. 저장소를 WSL 안에서 다시 받기 |
 | 첫 빌드에서 `CMakeCache` 경로 오류 | 복사해 온 `build/` 폴더 삭제 후 다시 빌드 |
