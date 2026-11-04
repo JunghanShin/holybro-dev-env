@@ -345,5 +345,7 @@ apt-get -s install nvidia-jetpack=<버전> | awk '/^Inst/{print $2"="$3}' | tr -
 | 첫 빌드에서 `CMakeCache` 경로 오류 | 복사해 온 `build/` 폴더 삭제 후 다시 빌드 |
 | Jetson에서 `GLIBC_x.xx not found` | `jetson-build`로 빌드했는지 확인 |
 | `jetson-deploy`가 `Permission denied` | SSH 키 등록 확인. Git Bash와 PowerShell은 키를 두는 홈 폴더가 다를 수 있음 |
+| `CMakeCache.txt` 등에 `Permission denied` (Docker Desktop에서 WSL Docker 엔진으로 바꾼 뒤) | Docker Desktop이 만든 `build/` 폴더가 WSL에서 root 소유로 보입니다. Windows 탐색기나 `sudo rm -rf build`로 `build/` 폴더를 지우고 다시 빌드 |
+| WSL에서 `jetson-deploy`·`jetson-debug`가 `Permission denied (publickey)` | WSL에는 Windows의 SSH 키가 없습니다. WSL에서 `ssh-keygen -t ed25519`로 키를 만들어 Jetson에 등록(`ssh-copy-id`) |
 | 빌드가 매우 느림 | 소스를 `/mnt/d`에서 WSL 안으로 옮기기 |
 | `Permission denied`로 스크립트 실행 불가 | `git update-index --chmod=+x install.sh bin/*` 후 커밋 |
