@@ -18,8 +18,8 @@ int main(int argc, char* argv[]) {
     std::printf("TensorRT  : %d.%d.%d\n", trt / 10000, (trt / 100) % 100, trt % 100);
 
     std::printf("cuDNN     : %zu\n", cudnnGetVersion());
-    const int vpi = vpiGetVersion();  // major*1000000 + minor*1000 + patch
-    std::printf("VPI       : %d.%d.%d\n", vpi / 1000000, (vpi / 1000) % 1000, vpi % 1000);
+    const int vpi = vpiGetVersion();  // major*1000000 + minor*10000 + patch*100 (3.2.4 -> 3020400)
+    std::printf("VPI       : %d.%d.%d\n", vpi / 1000000, (vpi / 10000) % 100, (vpi / 100) % 100);
     std::printf("OpenCV    : %s\n", cv::getVersionString().c_str());
 
     gst_init(&argc, &argv);
