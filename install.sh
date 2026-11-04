@@ -57,11 +57,17 @@ ensure_docker() {
             exit 1
             ;;
     esac
-    local docker_bin
+    # Docker Desktop의 WSL 연동이 남긴 docker 명령. 대상이 있으면 Docker Desktop이 꺼진 것이고,
+    # 대상이 없으면(Docker Desktop을 지움) 무시하고 Docker 엔진을 설치한다
+    local docker_bin docker_real
     docker_bin="$(command -v docker 2>/dev/null || true)"
-    if [ -n "$docker_bin" ] && readlink -f "$docker_bin" | grep -q docker-desktop; then
-        echo "Docker Desktop이 꺼져 있습니다. Docker Desktop을 실행한 뒤 다시 실행하세요." >&2
-        exit 1
+    docker_real="$(readlink -f "$docker_bin" 2>/dev/null || true)"
+    if [ -n "$docker_bin" ] && [[ "$docker_real" == *docker-desktop* ]]; then
+        if [ -e "$docker_real" ]; then
+            echo "Docker Desktop이 꺼져 있습니다. Docker Desktop을 실행하거나, 지웠다면 WSL을 다시 시작(wsl --shutdown)한 뒤 다시 실행하세요." >&2
+            exit 1
+        fi
+        echo "Docker Desktop이 남긴 docker 연결($docker_bin)은 대상이 없어 무시합니다."
     fi
     if ! dpkg -s docker-ce >/dev/null 2>&1; then
         install_docker_engine
