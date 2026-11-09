@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# jetson-env, jetson-build, jetson-deploy, jetson-debug를 명령으로 등록하고 이미지를 빌드한다.
+# holybro-env, holybro-build, holybro-deploy, holybro-debug를 명령으로 등록하고 이미지를 빌드한다.
 # 시스템 폴더는 건드리지 않는다. ~/.local/bin에 실행 스크립트만 만든다.
 set -euo pipefail
 
@@ -7,7 +7,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="$HOME/.local/bin"
 mkdir -p "$TARGET_DIR"
 
-for name in jetson-env jetson-build jetson-deploy jetson-debug; do
+for name in holybro-env holybro-build holybro-deploy holybro-debug; do
     cat > "$TARGET_DIR/$name" <<EOF
 #!/usr/bin/env bash
 exec bash "$REPO_ROOT/bin/$name" "\$@"
@@ -15,6 +15,14 @@ EOF
     chmod +x "$TARGET_DIR/$name"
 done
 echo "명령 등록: $TARGET_DIR"
+
+# jetson-dev-env 시절에 등록한 jetson-* 명령은 지운다(그 저장소를 가리키는 것만).
+for old in jetson-env jetson-build jetson-deploy jetson-debug; do
+    if [ -f "$TARGET_DIR/$old" ] && grep -q 'jetson-dev-env/bin/' "$TARGET_DIR/$old"; then
+        rm -f "$TARGET_DIR/$old"
+        echo "예전 명령 삭제: $TARGET_DIR/$old"
+    fi
+done
 
 # ---- Docker: 없으면 Ubuntu(WSL 포함)에 Docker 엔진을 설치한다 --------------------------------
 # Docker Desktop을 이미 쓰고 있으면 그대로 쓴다. Docker Desktop은 회사 규모에 따라 유료라 설치하지 않는다.
@@ -83,8 +91,8 @@ ensure_docker() {
 }
 ensure_docker
 
-"$TARGET_DIR/jetson-env" build
-"$TARGET_DIR/jetson-env" check
+"$TARGET_DIR/holybro-env" build
+"$TARGET_DIR/holybro-env" check
 
 case ":$PATH:" in
     *":$TARGET_DIR:"*) ;;

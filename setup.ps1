@@ -1,4 +1,4 @@
-﻿# jetson-dev-env Windows 설치. 없는 것만 설치하고, 사람이 해야 할 단계에서 멈춰 안내한다.
+﻿# holybro-dev-env Windows 설치. 없는 것만 설치하고, 사람이 해야 할 단계에서 멈춰 안내한다.
 # 다시 실행하면 이어서 진행한다.
 #   1. WSL2가 없으면 설치 (관리자 권한, 재부팅 필요)
 #   2. WSL에 Ubuntu가 없으면 Ubuntu 22.04 설치 (처음 실행 때 리눅스 사용자 이름·비밀번호 입력)
@@ -7,7 +7,7 @@
 #   powershell -ExecutionPolicy Bypass -File setup.ps1
 param(
     [string]$Distro = "",
-    [string]$RepoUrl = "https://github.com/JunghanShin/jetson-dev-env.git"
+    [string]$RepoUrl = "https://github.com/JunghanShin/holybro-dev-env.git"
 )
 $ErrorActionPreference = "Stop"
 
@@ -86,9 +86,9 @@ if ($who -eq 'root' -or -not $who) {
 # 빌드 속도를 위해 /mnt/c가 아니라 WSL 홈에 둔다. install.sh는 sudo 비밀번호를 물을 수 있다.
 $script = "set -e; " +
     "command -v git >/dev/null || { sudo apt-get update && sudo apt-get install -y git; }; " +
-    "if [ -d ~/jetson-dev-env/.git ]; then git -C ~/jetson-dev-env pull --ff-only; " +
-    "else git clone '$RepoUrl' ~/jetson-dev-env; fi; " +
-    "~/jetson-dev-env/install.sh"
+    "if [ -d ~/holybro-dev-env/.git ]; then git -C ~/holybro-dev-env pull --ff-only; " +
+    "else git clone '$RepoUrl' ~/holybro-dev-env; fi; " +
+    "~/holybro-dev-env/install.sh"
 & wsl.exe -d $target.Name --cd "~" -- bash -lc $script
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
@@ -96,4 +96,4 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 Write-Host ""
-Write-Host "완료. Ubuntu 터미널(시작 메뉴의 $($target.Name))에서 jetson-build 등을 씁니다."
+Write-Host "완료. Ubuntu 터미널(시작 메뉴의 $($target.Name))에서 holybro-build 등을 씁니다."

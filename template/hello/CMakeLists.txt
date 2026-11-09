@@ -8,7 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(hello main.cpp)
 target_compile_options(hello PRIVATE -Wall -Wextra -Wpedantic)
 
-# jetson-deploy는 install 규칙으로 설치된 실행 파일을 복사한다.
+# holybro-deploy는 install 규칙으로 설치된 실행 파일을 복사한다.
 install(TARGETS hello RUNTIME DESTINATION bin)
 
 enable_testing()

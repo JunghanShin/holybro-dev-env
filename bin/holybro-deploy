@@ -4,7 +4,7 @@ set -euo pipefail
 
 usage() {
     cat <<EOF
-usage: jetson-deploy [-p PORT] USER@HOST REMOTE_DIR [프로젝트 폴더]
+usage: holybro-deploy [-p PORT] USER@HOST REMOTE_DIR [프로젝트 폴더]
 
   -p PORT        SSH 포트 (기본 22)
   USER@HOST      Jetson 접속 정보
@@ -42,7 +42,7 @@ bin_dir="$project/build/jetson/install/bin"
 shopt -s nullglob
 binaries=("$bin_dir"/*)
 if [ ${#binaries[@]} -eq 0 ]; then
-    echo "복사할 파일이 없습니다. 먼저 jetson-build를 실행하세요: $bin_dir" >&2
+    echo "복사할 파일이 없습니다. 먼저 holybro-build를 실행하세요: $bin_dir" >&2
     exit 1
 fi
 

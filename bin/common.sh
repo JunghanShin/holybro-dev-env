@@ -1,9 +1,9 @@
-# jetson-env, jetson-build가 함께 쓰는 함수. 직접 실행하지 않는다.
+# holybro-env, holybro-build가 함께 쓰는 함수. 직접 실행하지 않는다.
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")"
-IMAGE="jetson-dev:$VERSION"
-PROJECT_MARKER=".jetson-dev-env"
+IMAGE="holybro-dev:$VERSION"
+PROJECT_MARKER=".holybro-dev-env"
 
 require_docker() {
     if ! command -v docker >/dev/null 2>&1 || ! docker info >/dev/null 2>&1; then
@@ -23,7 +23,7 @@ ensure_image() {
     fi
 }
 
-# 위로 올라가며 .jetson-dev-env가 있는 폴더를 찾는다. 없으면 시작 폴더를 쓴다.
+# 위로 올라가며 .holybro-dev-env가 있는 폴더를 찾는다. 없으면 시작 폴더를 쓴다.
 # 표식이 있으면 저장소 전체가 마운트되어 ../libs 같은 공용 코드도 보인다.
 find_project_root() {
     local dir="$1"
@@ -47,7 +47,7 @@ check_project_version() {
     wanted="$(tr -d '[:space:]' < "$marker")"
     if [ "$wanted" != "$VERSION" ]; then
         echo "경고: 이 프로젝트는 환경 $wanted 기준인데 현재 환경은 $VERSION 입니다." >&2
-        echo "      jetson-dev-env 저장소를 맞춘 뒤 jetson-env build를 실행하세요." >&2
+        echo "      holybro-dev-env 저장소를 맞춘 뒤 holybro-env build를 실행하세요." >&2
     fi
 }
 
@@ -74,7 +74,7 @@ run_in_container() {
             ;;
     esac
 
-    # JETSON_DOCKER_ARGS: 명령별 추가 옵션(jetson-debug의 네트워크 등).
+    # JETSON_DOCKER_ARGS: 명령별 추가 옵션(holybro-debug의 네트워크 등).
     # compile_commands.json은 편집기 자동 완성용으로 항상 만든다(CMake 환경 변수).
     local extra_args=()
     [ -n "${JETSON_DOCKER_ARGS:-}" ] && read -r -a extra_args <<< "$JETSON_DOCKER_ARGS"
